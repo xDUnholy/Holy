@@ -42,41 +42,53 @@ local beep = Instance.new('Sound');
 beep.SoundId = 'rbxassetid://13681038983'
 
 ----------------------------------FUNCTIONS----------------------------------
-Toggles.autoPadlock:OnChanged(function()
-    if Toggles.autoPadlock.Value then
-        local addconnect
-        addconnect = char.ChildAdded:Connect(function(v)
-            if v:IsA('Tool') and v.Name == 'LibraryHintPaper' or v.Name == 'LibraryHintPaperHard' then
-                task.wait()
+function decipherCode()
+    local hints = plr.PlayerGui:WaitForChild('PermUI'):WaitForChild('Hints')
 
-                local code = table.concat(decipherCode())
+    if game.ReplicatedStorage:WaitForChild('GameData'):WaitForChild('Floor').Value == 'Fools' then
+        local paper = char:FindFirstChild('LibraryHintPaperHard') or plr.Backpack:FindFirstChild('LibraryHintPaperHard')
+        local code = {[1]='_', [2]='_', [3]='_', [4]='_', [5]='_', [6]='_', [7]='_', [8]='_', [9]='_', [10]='_'}
 
-                if not code:find('_') then
-                    entityInfo.PL:FireServer(code)
+        if paper.UI:FindFirstChild('Fake') then
+            paper.UI:FindFirstChild('Fake'):Destroy()
+        end
+
+        if paper then
+            for _, v in pairs(paper:WaitForChild('UI'):GetChildren()) do
+                if v:IsA('ImageLabel') and v.Name ~= 'Image' then
+                    for _, img in pairs(hints:GetChildren()) do
+                        if img:IsA('ImageLabel') and img.Visible and v.ImageRectOffset == img.ImageRectOffset then
+                            local num = img:FindFirstChild('TextLabel').Text
+
+                            code[tonumber(v.Name)] = num
+                        end
+                    end
                 end
             end
-        end)
+        end
 
-        local backpackconnect
-        backpackconnect = plr.Backpack.ChildAdded:Connect(function(v)
-            if v:IsA('Tool') and v.Name == 'LibraryHintPaper' or v.Name == 'LibraryHintPaperHard' then
-                local code = table.concat(decipherCode())
+        return code
+    else
+        local paper = char:FindFirstChild('LibraryHintPaper') or plr.Backpack:FindFirstChild('LibraryHintPaper')
+        local code = {[1]='_', [2]='_', [3]='_', [4]='_', [5]='_'}
 
-                repeat task.wait()
-                    code = table.concat(decipherCode())
-                until not code:find('_')
+        if paper then
+            for _, v in pairs(paper:WaitForChild('UI'):GetChildren()) do
+                if v:IsA('ImageLabel') and v.Name ~= 'Image' then
+                    for _, img in pairs(hints:GetChildren()) do
+                        if img:IsA('ImageLabel') and img.Visible and v.ImageRectOffset == img.ImageRectOffset then
+                            local num = img:FindFirstChild('TextLabel').Text
 
-                entityInfo.PL:FireServer(code)
+                            code[tonumber(v.Name)] = num
+                        end
+                    end
+                end
             end
-        end)
+        end
 
-        task.spawn(function()
-            repeat task.wait() until not Toggles.autoPadlock.Value
-            addconnect:Disconnect()
-            backpackconnect:Disconnect()
-        end)
+        return code
     end
-end)
+end
 
 
 local tpconnect
