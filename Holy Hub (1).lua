@@ -1,4 +1,4 @@
-repeat task.wait() until game:IsLoaded()
+
 --------------Variables--------------
 
 local repo = 'https://raw.githubusercontent.com/YassinMedany/LinoriaLib/main/'
